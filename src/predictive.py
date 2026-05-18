@@ -40,11 +40,18 @@ def predict_maintenance(device_id: str, key: str, hours_history: int = 168, fore
     
     health_score = 100.0
     if abs(trend) > std_val * 0.1:
-        health_score -= 20
+        health_score -= 25
+    if abs(trend) > std_val * 0.3:
+        health_score -= 25
     if current_val > mean_val + 2 * std_val:
         health_score -= 30
+    if current_val > mean_val + 3 * std_val:
+        health_score -= 20
     if current_val < mean_val - 2 * std_val:
         health_score -= 30
+    max_forecast = max([f["predicted_value"] for f in []]) if False else predictions.max()
+    if max_forecast > mean_val + 3 * std_val:
+        health_score -= 20
     health_score = max(0, min(100, health_score))
     
     risk_level = "LOW" if health_score > 70 else "MEDIUM" if health_score > 40 else "HIGH"
